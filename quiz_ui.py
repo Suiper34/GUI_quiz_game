@@ -1,53 +1,11 @@
 import tkinter as tk
 from tkinter import ttk
 
-import quiz_brain
-from question_model import QuestionModel as q_m
-
 GREEN = "#253c23"
 OPTION_INDEX = ('a', 'b', 'c', 'd')
 
-ques_ans_data = [
-    {
-        "type": "multiple",
-        "difficulty": "hard",
-        "category": "Science: Computers",
-        "question": "What vulnerability ranked #1 on the OWASP Top 10 in 2013?",
-        "correct_answer": "Injection",
-        "options": [
-                "Broken Authentication",
-                "Cross-Site Scripting",
-                "Injection",
-                "Insecure Direct Object References"
-        ]
-    },
-    {
-        "type": "multiple",
-        "difficulty": "hard",
-        "category": "Science: Computers",
-        "question": "Who is the founder of Palantir?",
-        "correct_answer": "Peter Thiel",
-        "options": [
-                "Peter Thiel",
-                "Mark Zuckerberg",
-                "Marc Benioff",
-                "Jack Dorsey"
-        ]
-    },]
 
-
-questions_answers_bank = []
-question_data = ques_ans_data
-
-for data in question_data:
-    ques_model = q_m(data["question"],
-                     data["correct_answer"], data["options"])
-
-    questions_answers_bank.append(ques_model)
-ques_structure = questions_answers_bank
-
-
-class Interface:
+class QuizInterface:
     def __init__(self, questions_data_list: list):
         self.initial_score = 0
         self.ques_data_list = questions_data_list
@@ -115,8 +73,8 @@ class Interface:
         self.check_button.grid(column=1, row=1)
 
         self.rootscreen.mainloop()
-    # check if user input is right, then update score
 
+    # check if user input is right, then update score
     def check_command(self):
         if self.ques_data_index < len(self.ques_data_list):
             user_ans = self.answer_input.get()  # get hold of user input
@@ -137,7 +95,6 @@ class Interface:
             self.rootscreen.destroy()
 
     # generate next question and corresponding options
-
     def next_question(self):
         if self.ques_data_index < len(self.ques_data_list):
             self.canvas.itemconfigure(
@@ -154,6 +111,3 @@ class Interface:
                 text=f'{self.initial_score}/{len(self.ques_data_list)}')
             self.canvas.itemconfigure(
                 self.quiz_question, text=f'Quiz Has Ended\n\nYou had {self.initial_score}/{len(self.ques_data_list)}')
-
-
-Interface(ques_structure)

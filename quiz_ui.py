@@ -64,7 +64,7 @@ class QuizInterface:
         label.grid(column=0, row=0, pady=15, columnspan=2)
 
         self.answer_input = ttk.Entry(
-            user_answer_frame, font=('Times new roman', 14))
+            user_answer_frame, font=('Times new roman', 12))
         self.answer_input.focus()
         self.answer_input.grid(column=0, row=1, padx=10,)
 
@@ -84,6 +84,7 @@ class QuizInterface:
 
             self.ques_data_index += 1
             self.next_question()
+            self.answer_input.focus()  # set focus on answer input
             self.answer_input.delete(0, len(user_ans))
 
         elif self.ques_data_index == len(self.ques_data_list):

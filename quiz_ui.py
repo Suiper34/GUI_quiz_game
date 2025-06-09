@@ -4,7 +4,7 @@ from tkinter import ttk
 import quiz_brain
 from question_model import QuestionModel as q_m
 
-GREEN = "#14ca0b"
+GREEN = "#253c23"
 OPTION_INDEX = ('a', 'b', 'c', 'd')
 
 ques_ans_data = [
@@ -48,7 +48,7 @@ ques_structure = questions_answers_bank
 
 
 class Interface:
-    def __init__(self, questions_data_list):
+    def __init__(self, questions_data_list: list):
         self.initial_score = 0
         self.ques_data_list = questions_data_list
         self.ques_data_index = 0
@@ -58,69 +58,88 @@ class Interface:
         self.rootscreen.configure(bg=GREEN)
 
         self.style = ttk.Style()
-        main_frame = ttk.Frame(
+        self.main_frame = ttk.Frame(
             self.rootscreen, height=700, width=700, padding=30)
-        main_frame.grid()
+        self.main_frame.grid()
 
         self.style.configure('TFrame', background=GREEN)
-        score_frame = ttk.Frame(main_frame, padding=20,)
+        score_frame = ttk.Frame(self.main_frame, padding=20,)
         score_frame.grid(column=1, row=0)
 
         self.style.configure('TLabel', font=(
-            'Times new roman', 14), background=GREEN)
-        score = ttk.Label(score_frame, text='score:', padding=3)
-        score.grid(column=0, row=0)
+            'Times new roman', 13), background=GREEN, foreground='white')
 
-        score_point = ttk.Label(score_frame, text=0)
-        score_point.grid(column=1, row=0)
+        # score section
+        self.score = ttk.Label(score_frame, text='score:', padding=3)
+        self.score.grid(column=0, row=0)
 
-        canvas = tk.Canvas(main_frame, highlightthickness=0,
-                           height=300, width=350, bg='white')
-        canvas.create_text(175, 150, text=f'{self.ques_data_list[self.ques_data_index].ques}',
-                           font=('Times new roman', 14),)
-        canvas.grid(column=0, row=1, columnspan=2)
+        self.score_point = ttk.Label(score_frame, text=self.initial_score)
+        self.score_point.grid(column=1, row=0)
 
-        answers_frame = ttk.Frame(main_frame, padding=20)
+        # canvas and quiz question structure section
+        self.canvas = tk.Canvas(self.main_frame, highlightthickness=0,
+                                height=250, width=350, bg='white')
+        self.quiz_question = self.canvas.create_text(175, 125, text=f'{self.ques_data_list[self.ques_data_index].ques}',
+                                                     font=('Times new roman', 14), width=300, fill=GREEN)
+        self.canvas.grid(column=0, row=1, columnspan=2)
+
+        # ques options section:
+        answers_frame = ttk.Frame(self.main_frame, padding=20)
         answers_frame.grid(column=0, row=2)
 
-        i = 0
+        self.options_labels = []
 
-        for option in self.ques_data_list[self.ques_data_index].options:
+        for i, option in enumerate(self.ques_data_list[self.ques_data_index].options):
             option_indexs = ttk.Label(
                 answers_frame, text=f'{OPTION_INDEX[i]}.')
             option_indexs.grid(column=0, row=i, padx=10)
             options = ttk.Label(answers_frame, text=option)
             options.grid(column=1, row=i)
-            i += 1
+            self.options_labels.append(options)
 
-        user_answer_frame = ttk.Frame(main_frame, padding=20)
-        user_answer_frame.grid(column=0, row=3, columnspan=2)
+        # user answer section
+        user_answer_frame = ttk.Frame(self.main_frame, padding=10)
+        user_answer_frame.grid(column=0, row=4, columnspan=2)
 
-        answer_input = ttk.Entry(
+        label = ttk.Label(
+            user_answer_frame, text='Enter the correct answer below ',)
+        label.grid(column=0, row=0, pady=15, columnspan=2)
+
+        self.answer_input = ttk.Entry(
             user_answer_frame, font=('Times new roman', 14))
-        answer_input.focus()
-        answer_input.grid(column=0, row=0, padx=10)
+        self.answer_input.focus()
+        self.answer_input.grid(column=0, row=1, padx=10,)
 
-        def check_command():
-            user_ans = answer_input.get()
-            if user_ans.lower() == (self.ques_data_list[self.ques_data_index].ans).lower():
-                correct = tk.PhotoImage(file='./images/right.png')
-                canva = tk.Canvas(main_frame, height=50, width=50,
-                                  background=GREEN, highlightthickness=0)
-                canva.create_image(25, 25, image=correct)
-                canva.grid(column=0, columnspan=2, row=4, padx=40, pady=15)
-            else:
-                incorrect = tk.PhotoImage(file='./images/wrong.png')
-                canva = tk.Canvas(main_frame, height=50, width=50,
-                                  background=GREEN, highlightthickness=0)
-                canva.create_image(25, 25, image=incorrect)
-                canva.grid(column=0, columnspan=2, row=4, padx=40, pady=15)
-
-        check_button = ttk.Button(
-            user_answer_frame, text='Check Answer', command=check_command)
-        check_button.grid(column=1, row=0)
+        self.check_button = ttk.Button(
+            user_answer_frame, text='Check Answer', command=self.check_command)
+        self.check_button.grid(column=1, row=1)
 
         self.rootscreen.mainloop()
+
+    def check_command(self):
+        if self.ques_data_index < len(self.ques_data_list):
+            user_ans = self.answer_input.get()  # get hold of user input
+            if user_ans.lower() == (self.ques_data_list[self.ques_data_index].ans).lower():
+                self.initial_score += 1
+                self.score_point.configure(text=self.initial_score)
+
+            self.ques_data_index += 1
+            self.next_question()
+        self.answer_input.delete(0, len(user_ans))
+
+    def next_question(self):
+        if self.ques_data_index < len(self.ques_data_list):
+            self.canvas.itemconfigure(
+                self.quiz_question, text=self.ques_data_list[self.ques_data_index].ques)
+
+            for i in range(len(self.ques_data_list[self.ques_data_index].options)):
+                self.options_labels[i].configure(
+                    text=self.ques_data_list[self.ques_data_index].options[i])
+
+        else:
+            self.score.configure(text='Total Score:')
+            self.score_point.configure(
+                text=f'{self.initial_score}/{len(self.ques_data_list)}')
 
 
 Interface(ques_structure)

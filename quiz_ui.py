@@ -115,6 +115,7 @@ class Interface:
         self.check_button.grid(column=1, row=1)
 
         self.rootscreen.mainloop()
+    # check if user input is right, then update score
 
     def check_command(self):
         if self.ques_data_index < len(self.ques_data_list):
@@ -125,13 +126,24 @@ class Interface:
 
             self.ques_data_index += 1
             self.next_question()
-        self.answer_input.delete(0, len(user_ans))
+            self.answer_input.delete(0, len(user_ans))
+
+        elif self.ques_data_index == len(self.ques_data_list):
+            self.check_button.configure(text='Quit')
+            self.ques_data_index += 1
+
+        else:
+            # calls the destroy method to exit game
+            self.rootscreen.destroy()
+
+    # generate next question and corresponding options
 
     def next_question(self):
         if self.ques_data_index < len(self.ques_data_list):
             self.canvas.itemconfigure(
                 self.quiz_question, text=self.ques_data_list[self.ques_data_index].ques)
 
+            # replace question options of previous ques with current question's
             for i in range(len(self.ques_data_list[self.ques_data_index].options)):
                 self.options_labels[i].configure(
                     text=self.ques_data_list[self.ques_data_index].options[i])
@@ -140,6 +152,8 @@ class Interface:
             self.score.configure(text='Total Score:')
             self.score_point.configure(
                 text=f'{self.initial_score}/{len(self.ques_data_list)}')
+            self.canvas.itemconfigure(
+                self.quiz_question, text=f'Quiz Has Ended\n\nYou had {self.initial_score}/{len(self.ques_data_list)}')
 
 
 Interface(ques_structure)

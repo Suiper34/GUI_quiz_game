@@ -24,5 +24,8 @@ for a_dict in ques_ans_dataa:
     shuffle(a_dict['incorrect_answers'])
 
     # html unescape to change html entites back to original format
-    html.unescape(a_dict['question'])
+    a_dict['question'] = html.unescape(a_dict['question'])
+    a_dict['incorrect_answer'] = [html.unescape(
+        ans) for ans in a_dict['incorrect_answers']]
+
 ques_ans_data = ques_ans_dataa
